@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Zoff | Roblox Videos</title>
-<meta name="description" content="Watch Zoff's Roblox videos. Funny moments, chaos, and insane gameplay.">
+<title>Zoff | Roblox Shorts</title>
 
 <style>
 body {
@@ -15,84 +14,108 @@ body {
   color: white;
 }
 
+/* HEADER */
 header {
-  padding: 30px;
+  padding: 25px;
   text-align: center;
   background: linear-gradient(90deg, #ff0000, #ff6600);
-  font-size: 34px;
+  font-size: 32px;
   font-weight: bold;
 }
 
 .subtext {
-  font-size: 16px;
-  margin-top: 10px;
+  font-size: 14px;
 }
 
 .subscribe-btn {
+  margin-top: 10px;
   display: inline-block;
-  margin-top: 15px;
-  padding: 12px 25px;
+  padding: 10px 20px;
   background: red;
+  border-radius: 10px;
   color: white;
   text-decoration: none;
-  border-radius: 10px;
   font-weight: bold;
 }
 
-.section {
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 15px;
   padding: 20px;
 }
 
-h2 {
-  margin-left: 10px;
-}
-
-.row {
-  display: flex;
-  overflow-x: auto;
-  gap: 15px;
-  padding: 15px;
-}
-
+/* CARD */
 .card {
-  min-width: 180px;
-  flex: 0 0 auto;
+  position: relative;
   cursor: pointer;
-  transition: 0.2s;
+  transition: 0.25s;
 }
 
 .card:hover {
-  transform: scale(1.07);
+  transform: scale(1.08);
 }
 
 .card img {
   width: 100%;
+  border-radius: 14px;
+  aspect-ratio: 9/16;
+  object-fit: cover;
+}
+
+/* PLAY ICON */
+.play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  padding: 8px 12px;
+}
+
+/* TITLE */
+.caption {
+  font-size: 12px;
+  margin-top: 5px;
+  color: #ccc;
+}
+
+/* MODAL PLAYER */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.95);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal iframe {
+  width: 90%;
+  max-width: 400px;
+  height: 70%;
   border-radius: 12px;
 }
 
-.play {
+.close {
   position: absolute;
-  transform: translate(-50%, -50%);
+  top: 20px;
+  right: 20px;
+  font-size: 30px;
+  cursor: pointer;
 }
 
-.caption {
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-.row::-webkit-scrollbar {
-  height: 8px;
-}
-
-.row::-webkit-scrollbar-thumb {
-  background: #444;
-  border-radius: 10px;
-}
-
-.footer {
+/* LOADING */
+.loader {
   text-align: center;
   padding: 20px;
-  color: #888;
 }
 </style>
 </head>
@@ -101,47 +124,42 @@ h2 {
 
 <header>
 🔥 ZOFF 🔥
-<div class="subtext">Roblox chaos, funny moments, and insane gameplay</div>
+<div class="subtext">Roblox chaos & insane moments</div>
 
 <a class="subscribe-btn" href="https://www.youtube.com/@8zoff" target="_blank">
-Subscribe on YouTube
+Subscribe
 </a>
 </header>
 
-<div class="section">
-<h2>🔥 Latest Uploads</h2>
-<div class="row" id="latestRow"></div>
-</div>
+<div class="grid" id="videoGrid"></div>
 
-<div class="section">
-<h2>🚀 More From Zoff</h2>
-<div class="row" id="moreRow"></div>
-</div>
+<div class="loader" id="loader">Loading more videos...</div>
 
-<div class="section">
-<h2>🎮 Even More Chaos</h2>
-<div class="row" id="extraRow"></div>
-</div>
-
-<div class="footer">
-© Zoff
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <span class="close" onclick="closeVideo()">✖</span>
+  <iframe id="player" src="" frameborder="0" allowfullscreen></iframe>
 </div>
 
 <script>
 const API_KEY = "AIzaSyAhWITFUBveF-dHZBDSYCY7o-zst-lmxrY";
 const CHANNEL_ID = "UCfa5-QhuRmRa7eMIx9fsepQ";
 
+let nextPageToken = "";
+
 async function loadVideos() {
-  const url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=20`;
+  let url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=8`;
+
+  if (nextPageToken) {
+    url += `&pageToken=${nextPageToken}`;
+  }
 
   const res = await fetch(url);
   const data = await res.json();
 
-  const latest = document.getElementById("latestRow");
-  const more = document.getElementById("moreRow");
-  const extra = document.getElementById("extraRow");
+  nextPageToken = data.nextPageToken;
 
-  let count = 0;
+  const grid = document.getElementById("videoGrid");
 
   data.items.forEach(video => {
     if (video.id.videoId) {
@@ -149,25 +167,35 @@ async function loadVideos() {
 
       const card = document.createElement("div");
       card.className = "card";
-      card.onclick = () => window.open(`https://youtube.com/watch?v=${id}`, "_blank");
+      card.onclick = () => openVideo(id);
 
       card.innerHTML = `
         <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
+        <div class="play">▶</div>
         <div class="caption">${video.snippet.title}</div>
       `;
 
-      if (count < 6) {
-        latest.appendChild(card);
-      } else if (count < 12) {
-        more.appendChild(card);
-      } else {
-        extra.appendChild(card);
-      }
-
-      count++;
+      grid.appendChild(card);
     }
   });
 }
+
+function openVideo(id) {
+  document.getElementById("modal").style.display = "flex";
+  document.getElementById("player").src = `https://www.youtube.com/embed/${id}?autoplay=1`;
+}
+
+function closeVideo() {
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("player").src = "";
+}
+
+/* INFINITE SCROLL */
+window.addEventListener("scroll", () => {
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+    loadVideos();
+  }
+});
 
 loadVideos();
 </script>
