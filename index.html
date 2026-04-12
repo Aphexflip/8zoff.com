@@ -1,3 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Zoff | Roblox Shorts</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(#0a0f1c, #111827);
+  color: white;
+}
+
+/* TOP BAR */
+.top-bar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: #00c6ff;
+  text-align: center;
+  padding: 12px;
+  font-weight: bold;
+  z-index: 1000;
+}
+
+/* HEADER */
+header {
+  padding: 20px;
+  text-align: center;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  font-size: 28px;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 🔥 better mobile */
+  gap: 12px;
+  padding: 15px;
+}
+
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+/* CARD */
+.card {
+  cursor: pointer;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 12px;
+  aspect-ratio: 9/16;
+  object-fit: cover;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+/* VIDEO */
+.modal iframe {
+  width: 100%;
+  max-width: 420px;
+  height: 80%;
+}
+
+/* CLOSE BUTTON */
+.close {
+  position: fixed;
+  top: 70px;
+  right: 15px;
+  font-size: 28px;
+  background: rgba(0,0,0,0.6);
+  padding: 10px;
+  border-radius: 50%;
+  z-index: 2000;
+}
+
+/* STICKY CTA */
+.sticky-cta {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #00c6ff;
+  text-align: center;
+  padding: 12px;
+  font-weight: bold;
+}
+
+/* FOOTER */
+footer {
+  padding: 80px 20px;
+  text-align: center;
+  font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top-bar">
+🎮 Roblox Gift Cards 👉 <a href="https://amzn.to/4c4zWPA" target="_blank">Get Yours</a>
+</div>
+
+<header>🔥 ZOFF 🔥</header>
+
+<div class="grid" id="videoGrid"></div>
+
+<footer>
+© Zoff  
+<br><br>
+As an Amazon Associate, I earn from qualifying purchases.
+</footer>
+
+<div class="sticky-cta">
+🎮 Need Robux? 👉 <a href="https://amzn.to/4c4zWPA" target="_blank">Get Gift Cards</a>
+</div>
+
+<div class="modal" id="modal">
+<span class="close" onclick="closeVideo()">✖</span>
+<iframe id="player"></iframe>
+</div>
+
 <script>
 
 // 🔥 PRIMARY + BACKUP PROXIES
@@ -98,3 +237,10 @@ function closeVideo() {
 loadVideos();
 
 </script>
+
+
+</body>
+</html>
+
+
+
