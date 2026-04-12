@@ -1,246 +1,413 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zoff | Roblox Shorts</title>
+  <meta name="description" content="Watch Zoff Roblox Shorts and get Roblox gift cards." />
+  <style>
+    :root {
+      --bg1: #0a0f1c;
+      --bg2: #111827;
+      --blue1: #4facfe;
+      --blue2: #00f2fe;
+      --blue3: #00c6ff;
+      --card: #1a2333;
+      --text: #ffffff;
+      --muted: #cbd5e1;
+    }
 
-<title>Zoff | Roblox Shorts</title>
+    * {
+      box-sizing: border-box;
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(#0a0f1c, #111827);
-  color: white;
-}
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(var(--bg1), var(--bg2));
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
 
-/* TOP BAR */
-.top-bar {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  background: #00c6ff;
-  text-align: center;
-  padding: 12px;
-  font-weight: bold;
-  z-index: 1000;
-}
+    a {
+      color: inherit;
+    }
 
-/* HEADER */
-header {
-  padding: 20px;
-  text-align: center;
-  background: linear-gradient(90deg, #4facfe, #00f2fe);
-  font-size: 28px;
-}
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+      background: var(--blue3);
+      color: white;
+      text-align: center;
+      padding: 12px 14px;
+      font-weight: 700;
+      font-size: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
 
-/* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 🔥 better mobile */
-  gap: 12px;
-  padding: 15px;
-}
+    .top-bar a {
+      text-decoration: none;
+      font-weight: 800;
+    }
 
-@media (min-width: 600px) {
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  }
-}
+    header {
+      text-align: center;
+      padding: 24px 16px 18px;
+      background: linear-gradient(90deg, var(--blue1), var(--blue2));
+    }
 
-/* CARD */
-.card {
-  cursor: pointer;
-}
+    .brand {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      margin: 0;
+    }
 
-.card img {
-  width: 100%;
-  border-radius: 12px;
-  aspect-ratio: 9/16;
-  object-fit: cover;
-}
+    .sub {
+      margin: 8px 0 0;
+      font-size: 14px;
+      color: white;
+      opacity: 0.95;
+    }
 
-/* MODAL */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: black;
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
+    .header-actions {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-/* VIDEO */
-.modal iframe {
-  width: 100%;
-  max-width: 420px;
-  height: 80%;
-}
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      background: rgba(255,255,255,0.18);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
 
-/* CLOSE BUTTON */
-.close {
-  position: fixed;
-  top: 70px;
-  right: 15px;
-  font-size: 28px;
-  background: rgba(0,0,0,0.6);
-  padding: 10px;
-  border-radius: 50%;
-  z-index: 2000;
-}
+    .intro {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 16px 10px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
 
-/* STICKY CTA */
-.sticky-cta {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #00c6ff;
-  text-align: center;
-  padding: 12px;
-  font-weight: bold;
-}
+    .section-title {
+      margin: 0;
+      padding: 8px 16px 0;
+      font-size: 22px;
+      font-weight: 800;
+    }
 
-/* FOOTER */
-footer {
-  padding: 80px 20px;
-  text-align: center;
-  font-size: 12px;
-}
-</style>
+    .status {
+      padding: 10px 16px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 700px) {
+      .grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+    }
+
+    @media (min-width: 1100px) {
+      .grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+
+    .card {
+      background: transparent;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .thumb-wrap {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #0f172a;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 10px 22px rgba(0,0,0,0.25);
+    }
+
+    .card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      object-fit: cover;
+    }
+
+    .play {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.55);
+      color: white;
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 900;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    }
+
+    .caption {
+      padding: 8px 4px 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      min-height: 36px;
+    }
+
+    .money-block {
+      margin: 14px auto 10px;
+      max-width: 900px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 18px 16px;
+      text-align: center;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    }
+
+    .money-block h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .money-block p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .money-block .cta {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: var(--blue3);
+      color: white;
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    footer {
+      text-align: center;
+      padding: 28px 16px 110px;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    .sticky-cta {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--blue3);
+      color: white;
+      text-align: center;
+      padding: 12px 14px;
+      font-weight: 800;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.25);
+    }
+
+    .sticky-cta a {
+      text-decoration: none;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.94);
+      padding: 90px 16px 90px;
+    }
+
+    .modal-inner {
+      position: relative;
+      width: min(100%, 460px);
+    }
+
+    .modal iframe {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      border: 0;
+      border-radius: 16px;
+      background: black;
+    }
+
+    .close {
+      position: fixed;
+      top: 72px;
+      right: 14px;
+      z-index: 2100;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      font-size: 26px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="top-bar">
+    🎮 Roblox Gift Cards 👉
+    <a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">Get Yours</a>
+  </div>
 
-<div class="top-bar">
-🎮 Roblox Gift Cards 👉 <a href="https://amzn.to/4c4zWPA" target="_blank">Get Yours</a>
-</div>
+  <header>
+    <h1 class="brand">🔥 ZOFF 🔥</h1>
+    <p class="sub">Roblox chaos, insane moments, and fast shorts</p>
+    <div class="header-actions">
+      <a class="btn" href="https://www.youtube.com/@8zoff" target="_blank" rel="noopener">Subscribe on YouTube</a>
+    </div>
+  </header>
 
-<header>🔥 ZOFF 🔥</header>
+  <div class="intro">
+    Zoff drops Roblox shorts and quick chaos clips. This site automatically shows the newest uploads and gives fans a fast place to watch and keep scrolling.
+  </div>
 
-<div class="grid" id="videoGrid"></div>
+  <h2 class="section-title">Latest Videos</h2>
+  <div id="status" class="status">Loading videos...</div>
+  <div id="videoGrid" class="grid"></div>
 
-<footer>
-© Zoff  
-<br><br>
-As an Amazon Associate, I earn from qualifying purchases.
-</footer>
+  <div class="money-block">
+    <h2>🎮 Roblox Gift Cards</h2>
+    <p>Need Robux? Grab a Roblox gift card here.</p>
+    <a class="cta" href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">Get Gift Cards</a>
+  </div>
 
-<div class="sticky-cta">
-🎮 Need Robux? 👉 <a href="https://amzn.to/4c4zWPA" target="_blank">Get Gift Cards</a>
-</div>
+  <footer>
+    © Zoff
+    <br><br>
+    As an Amazon Associate, I earn from qualifying purchases.
+  </footer>
 
-<div class="modal" id="modal">
-<span class="close" onclick="closeVideo()">✖</span>
-<iframe id="player"></iframe>
-</div>
+  <div class="sticky-cta">
+    🎮 Need Robux? 👉
+    <a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">Get Gift Cards</a>
+  </div>
 
-<script>
+  <div id="modal" class="modal" aria-hidden="true">
+    <button class="close" type="button" aria-label="Close video" onclick="closeVideo()">✕</button>
+    <div class="modal-inner">
+      <iframe id="player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
 
-// 🔥 PRIMARY + BACKUP PROXIES
-const FEED_URLS = [
-  "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://www.youtube.com/feeds/videos.xml?channel_id=UCfa5-QhuRmRa7eMIx9fsepQ"),
-  "https://cors.isomorphic-git.org/https://www.youtube.com/feeds/videos.xml?channel_id=UCfa5-QhuRmRa7eMIx9fsepQ"
-];
+  <script>
+    async function loadVideos() {
+      const status = document.getElementById("status");
+      const grid = document.getElementById("videoGrid");
 
-const CACHE_KEY = "zoff_feed";
-const CACHE_TIME = 10 * 60 * 1000; // 10 minutes
+      try {
+        const res = await fetch("./videos.json?ts=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("videos.json not found");
 
-const grid = document.getElementById("videoGrid");
+        const videos = await res.json();
 
-// 🔥 LOADING MESSAGE
-grid.innerHTML = "<p style='text-align:center;width:100%'>Loading videos...</p>";
+        grid.innerHTML = "";
 
-async function fetchFeed() {
-  for (let url of FEED_URLS) {
-    try {
-      const res = await fetch(url);
-      const text = await res.text();
-      return text;
-    } catch (err) {
-      console.warn("Proxy failed, trying next...");
+        videos.forEach(video => {
+          const id = video.id;
+          const title = video.title || "Zoff Video";
+
+          const card = document.createElement("div");
+          card.className = "card";
+          card.onclick = () => openVideo(id);
+
+          card.innerHTML = `
+            <div class="thumb-wrap">
+              <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg" alt="${escapeHtml(title)}">
+              <div class="play">▶</div>
+            </div>
+            <div class="caption">${escapeHtml(title)}</div>
+          `;
+
+          grid.appendChild(card);
+        });
+
+        status.textContent = videos.length ? "" : "No videos found yet.";
+      } catch (err) {
+        console.error(err);
+        status.textContent = "Could not load videos right now.";
+      }
     }
-  }
-  throw new Error("All proxies failed");
-}
 
-async function loadVideos() {
-
-  // 🔥 CACHE FIRST
-  const cached = localStorage.getItem(CACHE_KEY);
-  if (cached) {
-    const parsed = JSON.parse(cached);
-    if (Date.now() - parsed.time < CACHE_TIME) {
-      buildGrid(parsed.videos);
-      return;
-    }
-  }
-
-  try {
-    const text = await fetchFeed();
-
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(text, "text/xml");
-
-    const entries = xml.getElementsByTagName("entry");
-
-    let videos = [];
-
-    for (let i = 0; i < entries.length; i++) {
-      const id = entries[i].getElementsByTagName("yt:videoId")[0].textContent;
-      videos.push(id);
+    function openVideo(id) {
+      const modal = document.getElementById("modal");
+      const player = document.getElementById("player");
+      player.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+      modal.style.display = "flex";
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
     }
 
-    // SAVE CACHE
-    localStorage.setItem(CACHE_KEY, JSON.stringify({
-      time: Date.now(),
-      videos: videos
-    }));
+    function closeVideo() {
+      const modal = document.getElementById("modal");
+      const player = document.getElementById("player");
+      modal.style.display = "none";
+      modal.setAttribute("aria-hidden", "true");
+      player.src = "";
+      document.body.style.overflow = "";
+    }
 
-    buildGrid(videos);
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
 
-  } catch (err) {
-    console.error(err);
-    grid.innerHTML = "<p style='text-align:center;width:100%'>Failed to load videos. Refresh.</p>";
-  }
-}
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeVideo();
+    });
 
-function buildGrid(videos) {
-  grid.innerHTML = "";
+    document.getElementById("modal").addEventListener("click", (e) => {
+      if (e.target.id === "modal") closeVideo();
+    });
 
-  videos.forEach(id => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.onclick = () => openVideo(id);
-
-    card.innerHTML = `
-      <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
-    `;
-
-    grid.appendChild(card);
-  });
-}
-
-// MODAL
-function openVideo(id) {
-  document.getElementById("modal").style.display = "flex";
-  document.getElementById("player").src = `https://www.youtube.com/embed/${id}?autoplay=1`;
-}
-
-function closeVideo() {
-  document.getElementById("modal").style.display = "none";
-  document.getElementById("player").src = "";
-}
-
-loadVideos();
-
-</script>
-
-
+    loadVideos();
+  </script>
 </body>
 </html>
-
-
-
