@@ -1,153 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Zoff | Roblox Shorts</title>
-
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(#0a0f1c, #111827);
-  color: white;
-}
-
-/* TOP BAR */
-.top-bar {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  background: #00c6ff;
-  text-align: center;
-  padding: 12px;
-  font-weight: bold;
-  z-index: 1000;
-}
-
-/* HEADER */
-header {
-  padding: 20px;
-  text-align: center;
-  background: linear-gradient(90deg, #4facfe, #00f2fe);
-  font-size: 28px;
-}
-
-/* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 🔥 better mobile */
-  gap: 12px;
-  padding: 15px;
-}
-
-@media (min-width: 600px) {
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  }
-}
-
-/* CARD */
-.card {
-  cursor: pointer;
-}
-
-.card img {
-  width: 100%;
-  border-radius: 12px;
-  aspect-ratio: 9/16;
-  object-fit: cover;
-}
-
-/* MODAL */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: black;
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-
-/* VIDEO */
-.modal iframe {
-  width: 100%;
-  max-width: 420px;
-  height: 80%;
-}
-
-/* CLOSE BUTTON */
-.close {
-  position: fixed;
-  top: 70px;
-  right: 15px;
-  font-size: 28px;
-  background: rgba(0,0,0,0.6);
-  padding: 10px;
-  border-radius: 50%;
-  z-index: 2000;
-}
-
-/* STICKY CTA */
-.sticky-cta {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #00c6ff;
-  text-align: center;
-  padding: 12px;
-  font-weight: bold;
-}
-
-/* FOOTER */
-footer {
-  padding: 80px 20px;
-  text-align: center;
-  font-size: 12px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="top-bar">
-🎮 Roblox Gift Cards 👉 <a href="https://amzn.to/4c4zWPA" target="_blank">Get Yours</a>
-</div>
-
-<header>🔥 ZOFF 🔥</header>
-
-<div class="grid" id="videoGrid"></div>
-
-<footer>
-© Zoff  
-<br><br>
-As an Amazon Associate, I earn from qualifying purchases.
-</footer>
-
-<div class="sticky-cta">
-🎮 Need Robux? 👉 <a href="https://amzn.to/4c4zWPA" target="_blank">Get Gift Cards</a>
-</div>
-
-<div class="modal" id="modal">
-<span class="close" onclick="closeVideo()">✖</span>
-<iframe id="player"></iframe>
-</div>
-
 <script>
 
-// 🔥 FASTER RSS PROXY
-const FEED_URL = "https://corsproxy.io/?https://www.youtube.com/feeds/videos.xml?channel_id=UCfa5-QhuRmRa7eMIx9fsepQ";
+// 🔥 PRIMARY + BACKUP PROXIES
+const FEED_URLS = [
+  "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://www.youtube.com/feeds/videos.xml?channel_id=UCfa5-QhuRmRa7eMIx9fsepQ"),
+  "https://cors.isomorphic-git.org/https://www.youtube.com/feeds/videos.xml?channel_id=UCfa5-QhuRmRa7eMIx9fsepQ"
+];
 
 const CACHE_KEY = "zoff_feed";
-const CACHE_TIME = 10 * 60 * 1000; // 10 min
+const CACHE_TIME = 10 * 60 * 1000; // 10 minutes
+
+const grid = document.getElementById("videoGrid");
+
+// 🔥 LOADING MESSAGE
+grid.innerHTML = "<p style='text-align:center;width:100%'>Loading videos...</p>";
+
+async function fetchFeed() {
+  for (let url of FEED_URLS) {
+    try {
+      const res = await fetch(url);
+      const text = await res.text();
+      return text;
+    } catch (err) {
+      console.warn("Proxy failed, trying next...");
+    }
+  }
+  throw new Error("All proxies failed");
+}
 
 async function loadVideos() {
 
-  // 🔥 LOAD CACHE FIRST
+  // 🔥 CACHE FIRST
   const cached = localStorage.getItem(CACHE_KEY);
   if (cached) {
     const parsed = JSON.parse(cached);
@@ -158,8 +40,7 @@ async function loadVideos() {
   }
 
   try {
-    const res = await fetch(FEED_URL);
-    const text = await res.text();
+    const text = await fetchFeed();
 
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, "text/xml");
@@ -183,18 +64,21 @@ async function loadVideos() {
 
   } catch (err) {
     console.error(err);
+    grid.innerHTML = "<p style='text-align:center;width:100%'>Failed to load videos. Refresh.</p>";
   }
 }
 
 function buildGrid(videos) {
-  const grid = document.getElementById("videoGrid");
+  grid.innerHTML = "";
 
   videos.forEach(id => {
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = () => openVideo(id);
 
-    card.innerHTML = `<img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">`;
+    card.innerHTML = `
+      <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
+    `;
 
     grid.appendChild(card);
   });
@@ -214,6 +98,3 @@ function closeVideo() {
 loadVideos();
 
 </script>
-
-</body>
-</html>
