@@ -21,51 +21,75 @@ body {
   width: 100%;
   background: #00c6ff;
   text-align: center;
-  padding: 10px;
+  padding: 12px;
   font-weight: bold;
   z-index: 1000;
 }
-.top-bar a { color: white; text-decoration: none; }
 
 /* HEADER */
 header {
-  padding: 25px;
+  padding: 20px;
   text-align: center;
   background: linear-gradient(90deg, #4facfe, #00f2fe);
-  font-size: 32px;
+  font-size: 28px;
 }
 
 /* GRID */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 15px;
-  padding: 20px;
+  grid-template-columns: repeat(2, 1fr); /* 🔥 better mobile */
+  gap: 12px;
+  padding: 15px;
+}
+
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
 }
 
 /* CARD */
 .card {
   cursor: pointer;
-  transition: 0.25s;
 }
-.card:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 15px #4facfe;
-}
+
 .card img {
   width: 100%;
-  border-radius: 14px;
+  border-radius: 12px;
   aspect-ratio: 9/16;
   object-fit: cover;
 }
 
-/* MID MONEY BLOCK */
-.money-block {
-  margin: 20px;
-  padding: 20px;
-  background: #1a2333;
-  text-align: center;
-  border-radius: 12px;
+/* MODAL */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+/* VIDEO */
+.modal iframe {
+  width: 100%;
+  max-width: 420px;
+  height: 80%;
+}
+
+/* CLOSE BUTTON */
+.close {
+  position: fixed;
+  top: 70px;
+  right: 15px;
+  font-size: 28px;
+  background: rgba(0,0,0,0.6);
+  padding: 10px;
+  border-radius: 50%;
+  z-index: 2000;
 }
 
 /* STICKY CTA */
@@ -78,42 +102,11 @@ header {
   padding: 12px;
   font-weight: bold;
 }
-.sticky-cta a {
-  color: white;
-  text-decoration: none;
-}
 
-/* MODAL */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.95);
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-.modal iframe {
-  width: 90%;
-  max-width: 400px;
-  height: 70%;
-}
-.close {
-  position: fixed;
-  top: 70px;
-  right: 20px;
-  font-size: 28px;
-  background: rgba(0,0,0,0.6);
-  padding: 8px 12px;
-  border-radius: 50%;
-  z-index: 2000;
-}
-
+/* FOOTER */
 footer {
+  padding: 80px 20px;
   text-align: center;
-  padding: 60px 20px 100px;
   font-size: 12px;
 }
 </style>
@@ -121,27 +114,13 @@ footer {
 
 <body>
 
-<!-- TOP BAR -->
 <div class="top-bar">
-🎮 Roblox Gift Cards 👉 
-<a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
-Get Yours
-</a>
+🎮 Roblox Gift Cards 👉 <a href="https://amzn.to/4c4zWPA" target="_blank">Get Yours</a>
 </div>
 
-<header>
-🔥 ZOFF 🔥
-</header>
+<header>🔥 ZOFF 🔥</header>
 
 <div class="grid" id="videoGrid"></div>
-
-<!-- MID MONEY -->
-<div class="money-block">
-<h2>🎮 Get Roblox Gift Cards</h2>
-<a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
-🔥 Click Here
-</a>
-</div>
 
 <footer>
 © Zoff  
@@ -149,15 +128,10 @@ Get Yours
 As an Amazon Associate, I earn from qualifying purchases.
 </footer>
 
-<!-- STICKY CTA -->
 <div class="sticky-cta">
-🎮 Need Robux? 👉 
-<a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
-Get Gift Cards
-</a>
+🎮 Need Robux? 👉 <a href="https://amzn.to/4c4zWPA" target="_blank">Get Gift Cards</a>
 </div>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
 <span class="close" onclick="closeVideo()">✖</span>
 <iframe id="player"></iframe>
@@ -165,55 +139,65 @@ Get Gift Cards
 
 <script>
 
-// RSS FEED
-const FEED_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(
-  "https://www.youtube.com/feeds/videos.xml?channel_id=UCfa5-QhuRmRa7eMIx9fsepQ"
-);
+// 🔥 FASTER RSS PROXY
+const FEED_URL = "https://corsproxy.io/?https://www.youtube.com/feeds/videos.xml?channel_id=UCfa5-QhuRmRa7eMIx9fsepQ";
 
-let allVideos = [];
-let loadedCount = 0;
-const LOAD_BATCH = 8;
+const CACHE_KEY = "zoff_feed";
+const CACHE_TIME = 10 * 60 * 1000; // 10 min
 
-// LOAD FEED
-async function loadFeed() {
-  const res = await fetch(FEED_URL);
-  const text = await res.text();
+async function loadVideos() {
 
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(text, "text/xml");
-
-  const entries = xml.getElementsByTagName("entry");
-
-  for (let i = 0; i < entries.length; i++) {
-    const id = entries[i].getElementsByTagName("yt:videoId")[0].textContent;
-    allVideos.push(id);
+  // 🔥 LOAD CACHE FIRST
+  const cached = localStorage.getItem(CACHE_KEY);
+  if (cached) {
+    const parsed = JSON.parse(cached);
+    if (Date.now() - parsed.time < CACHE_TIME) {
+      buildGrid(parsed.videos);
+      return;
+    }
   }
 
-  // 🔥 LOAD MULTIPLE BATCHES UP FRONT
-  loadMore();
-  loadMore(); // now 16 videos instantly
+  try {
+    const res = await fetch(FEED_URL);
+    const text = await res.text();
+
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, "text/xml");
+
+    const entries = xml.getElementsByTagName("entry");
+
+    let videos = [];
+
+    for (let i = 0; i < entries.length; i++) {
+      const id = entries[i].getElementsByTagName("yt:videoId")[0].textContent;
+      videos.push(id);
+    }
+
+    // SAVE CACHE
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      time: Date.now(),
+      videos: videos
+    }));
+
+    buildGrid(videos);
+
+  } catch (err) {
+    console.error(err);
+  }
 }
 
-// LOAD MORE
-function loadMore() {
+function buildGrid(videos) {
   const grid = document.getElementById("videoGrid");
 
-  for (let i = 0; i < LOAD_BATCH; i++) {
-    if (loadedCount >= allVideos.length) return;
-
-    const id = allVideos[loadedCount];
-
+  videos.forEach(id => {
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = () => openVideo(id);
 
-    card.innerHTML = `
-      <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
-    `;
+    card.innerHTML = `<img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">`;
 
     grid.appendChild(card);
-    loadedCount++;
-  }
+  });
 }
 
 // MODAL
@@ -227,87 +211,7 @@ function closeVideo() {
   document.getElementById("player").src = "";
 }
 
-// 🔥 BETTER SCROLL DETECTION
-window.addEventListener("scroll", () => {
-  if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 200)) {
-    loadMore();
-  }
-});
-
-loadFeed();
-
-</script><script>
-
-// RSS FEED
-const FEED_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(
-  "https://www.youtube.com/feeds/videos.xml?channel_id=UCfa5-QhuRmRa7eMIx9fsepQ"
-);
-
-let allVideos = [];
-let loadedCount = 0;
-const LOAD_BATCH = 8;
-
-// LOAD FEED
-async function loadFeed() {
-  const res = await fetch(FEED_URL);
-  const text = await res.text();
-
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(text, "text/xml");
-
-  const entries = xml.getElementsByTagName("entry");
-
-  for (let i = 0; i < entries.length; i++) {
-    const id = entries[i].getElementsByTagName("yt:videoId")[0].textContent;
-    allVideos.push(id);
-  }
-
-  // 🔥 LOAD MULTIPLE BATCHES UP FRONT
-  loadMore();
-  loadMore(); // now 16 videos instantly
-}
-
-// LOAD MORE
-function loadMore() {
-  const grid = document.getElementById("videoGrid");
-
-  for (let i = 0; i < LOAD_BATCH; i++) {
-    if (loadedCount >= allVideos.length) return;
-
-    const id = allVideos[loadedCount];
-
-    const card = document.createElement("div");
-    card.className = "card";
-    card.onclick = () => openVideo(id);
-
-    card.innerHTML = `
-      <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
-    `;
-
-    grid.appendChild(card);
-    loadedCount++;
-  }
-}
-
-// MODAL
-function openVideo(id) {
-  document.getElementById("modal").style.display = "flex";
-  document.getElementById("player").src = `https://www.youtube.com/embed/${id}?autoplay=1`;
-}
-
-function closeVideo() {
-  document.getElementById("modal").style.display = "none";
-  document.getElementById("player").src = "";
-}
-
-// 🔥 BETTER SCROLL DETECTION
-window.addEventListener("scroll", () => {
-  if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 200)) {
-    loadMore();
-  }
-});
-
-loadFeed();
+loadVideos();
 
 </script>
 
