@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Zoff | Roblox Videos</title>
-<meta name="description" content="Watch Zoff's Roblox Shorts and discover fun Roblox gear and content.">
+<meta name="description" content="Watch Zoff's Roblox Shorts and discover fun Roblox gear.">
 
 <style>
 body {
@@ -57,7 +57,6 @@ header {
 
 /* CARD */
 .card {
-  position: relative;
   cursor: pointer;
   transition: 0.25s;
 }
@@ -76,21 +75,12 @@ header {
 
 .play {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 30px;
-  background: rgba(0,0,0,0.6);
-  border-radius: 50%;
-  padding: 6px 10px;
-  color: #4facfe;
 }
 
-/* MONEY BLOCK */
+/* MONEY BOX */
 .money-box {
-  margin: 30px auto;
-  max-width: 800px;
   background: #1a2333;
+  margin: 30px;
   padding: 20px;
   border-radius: 12px;
   text-align: center;
@@ -114,7 +104,7 @@ header {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.95);
+  background: black;
   display: none;
   justify-content: center;
   align-items: center;
@@ -134,9 +124,11 @@ header {
   cursor: pointer;
 }
 
+/* FOOTER */
 footer {
   text-align: center;
   padding: 20px;
+  font-size: 12px;
   color: #888;
 }
 </style>
@@ -155,18 +147,17 @@ Subscribe
 
 <div class="content">
 <h2>🔥 Latest Videos</h2>
-<p>Watch the newest Roblox Shorts from Zoff.</p>
+<p>Watch the latest Roblox chaos and funny moments.</p>
 </div>
 
-<!-- VIDEO GRID -->
 <div class="grid" id="videoGrid"></div>
 
 <!-- 💰 MONEY SECTION -->
 <div class="money-box">
-<h2>🎮 Zoff’s Setup</h2>
-<p>Check out some of the gear and Roblox stuff used in these videos.</p>
+<h2>🎮 Zoff’s Gear</h2>
+<p>Check out some cool Roblox gear and gaming stuff 👇</p>
 
-<a class="money-btn" href="https://amzn.to/YOURAFFILIATE" target="_blank">
+<a class="money-btn" href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
 🔥 View Gear
 </a>
 </div>
@@ -177,13 +168,14 @@ Subscribe
 </div>
 
 <footer>
-© Zoff | Roblox Content Hub
+© Zoff  
+<br><br>
+As an Amazon Associate, I earn from qualifying purchases.
 </footer>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
-  <span class="close" onclick="closeVideo()">✖</span>
-  <iframe id="player" src="" frameborder="0" allowfullscreen></iframe>
+<span class="close" onclick="closeVideo()">✖</span>
+<iframe id="player" src="" frameborder="0"></iframe>
 </div>
 
 <script>
@@ -203,9 +195,7 @@ async function loadVideos() {
 
   let url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=8`;
 
-  if (nextPageToken) {
-    url += `&pageToken=${nextPageToken}`;
-  }
+  if (nextPageToken) url += `&pageToken=${nextPageToken}`;
 
   const res = await fetch(url);
   const data = await res.json();
@@ -222,10 +212,7 @@ async function loadVideos() {
       card.className = "card";
       card.onclick = () => openVideo(id);
 
-      card.innerHTML = `
-        <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
-        <div class="play">▶</div>
-      `;
+      card.innerHTML = `<img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">`;
 
       grid.appendChild(card);
     }
