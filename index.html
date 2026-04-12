@@ -25,11 +25,7 @@ body {
   font-weight: bold;
   z-index: 1000;
 }
-
-.top-bar a {
-  color: white;
-  text-decoration: none;
-}
+.top-bar a { color: white; text-decoration: none; }
 
 /* HEADER */
 header {
@@ -39,11 +35,7 @@ header {
   font-size: 32px;
   font-weight: bold;
 }
-
-.subtext {
-  font-size: 14px;
-}
-
+.subtext { font-size: 14px; }
 .subscribe-btn {
   margin-top: 10px;
   display: inline-block;
@@ -69,24 +61,19 @@ header {
   cursor: pointer;
   transition: 0.25s;
 }
-
 .card:hover {
   transform: scale(1.08);
   box-shadow: 0 0 15px #4facfe;
 }
-
 .card img {
   width: 100%;
   border-radius: 14px;
   aspect-ratio: 9/16;
   object-fit: cover;
 }
-
-/* PLAY ICON */
 .play {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   font-size: 32px;
   background: rgba(0,0,0,0.6);
@@ -95,29 +82,32 @@ header {
   color: #4facfe;
 }
 
+/* STATUS / ERRORS */
+.status {
+  text-align: center;
+  padding: 12px;
+  color: #9aa;
+  font-size: 13px;
+}
+
 /* MODAL */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: rgba(0,0,0,0.95);
   display: none;
   justify-content: center;
   align-items: center;
 }
-
 .modal iframe {
   width: 90%;
   max-width: 400px;
   height: 70%;
 }
-
 .close {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 20px; right: 20px;
   font-size: 30px;
   cursor: pointer;
 }
@@ -137,21 +127,17 @@ footer {
 <!-- 💰 AMAZON BAR -->
 <div class="top-bar">
 🎮 Roblox Gift Cards 👉 
-<a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
-Get Yours
-</a>
+<a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">Get Yours</a>
 </div>
 
 <header>
 🔥 ZOFF 🔥
 <div class="subtext">Roblox chaos & insane moments</div>
-
-<a class="subscribe-btn" href="https://www.youtube.com/@8zoff" target="_blank">
-Subscribe
-</a>
+<a class="subscribe-btn" href="https://www.youtube.com/@8zoff" target="_blank">Subscribe</a>
 </header>
 
-<!-- VIDEO GRID -->
+<div id="status" class="status">Loading videos…</div>
+
 <div class="grid" id="videoGrid"></div>
 
 <footer>
@@ -162,8 +148,8 @@ As an Amazon Associate, I earn from qualifying purchases.
 
 <!-- MODAL -->
 <div class="modal" id="modal">
-<span class="close" onclick="closeVideo()">✖</span>
-<iframe id="player" src="" frameborder="0"></iframe>
+  <span class="close" onclick="closeVideo()">✖</span>
+  <iframe id="player" src="" frameborder="0"></iframe>
 </div>
 
 <script>
@@ -173,45 +159,84 @@ const CHANNEL_ID = "UCfa5-QhuRmRa7eMIx9fsepQ";
 let nextPageToken = "";
 let isLoading = false;
 let loadCount = 0;
-const MAX_LOADS = 3;
+const MAX_LOADS = 5;
+
+// Build URL safely (prevents malformed query issues)
+function buildUrl() {
+  const base = new URL("https://www.googleapis.com/youtube/v3/search");
+  base.searchParams.set("key", API_KEY);
+  base.searchParams.set("channelId", CHANNEL_ID);
+  base.searchParams.set("part", "snippet,id");
+  base.searchParams.set("order", "date");
+  base.searchParams.set("maxResults", "8");
+  base.searchParams.set("type", "video"); // ensure only videos
+
+  if (nextPageToken) {
+    base.searchParams.set("pageToken", nextPageToken);
+  }
+  return base.toString();
+}
 
 async function loadVideos() {
   if (isLoading) return;
-  if (loadCount >= MAX_LOADS) return;
-
-  isLoading = true;
-
-  let url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=8`;
-
-  if (nextPageToken) {
-    url += `&pageToken=${nextPageToken}`;
+  if (loadCount >= MAX_LOADS) {
+    document.getElementById("status").innerText = "You’ve reached the end. 👍";
+    return;
   }
 
-  const res = await fetch(url);
-  const data = await res.json();
+  isLoading = true;
+  document.getElementById("status").innerText = "Loading videos…";
 
-  nextPageToken = data.nextPageToken || "";
+  try {
+    const url = buildUrl();
+    const res = await fetch(url);
 
-  const grid = document.getElementById("videoGrid");
+    // Handle non-200 responses
+    if (!res.ok) {
+      const txt = await res.text();
+      console.error("HTTP ERROR:", res.status, txt);
+      document.getElementById("status").innerText = "Error loading videos. Refresh or try again.";
+      isLoading = false;
+      return;
+    }
 
-  data.items.forEach(video => {
-    if (video.id.videoId) {
-      const id = video.id.videoId;
+    const data = await res.json();
+
+    // Handle API error payloads
+    if (!data || !data.items) {
+      console.error("API ERROR PAYLOAD:", data);
+      document.getElementById("status").innerText = "API error. Refresh page.";
+      isLoading = false;
+      return;
+    }
+
+    nextPageToken = data.nextPageToken || "";
+
+    const grid = document.getElementById("videoGrid");
+
+    data.items.forEach(v => {
+      if (!v.id || !v.id.videoId) return;
+      const id = v.id.videoId;
 
       const card = document.createElement("div");
       card.className = "card";
       card.onclick = () => openVideo(id);
 
       card.innerHTML = `
-        <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
+        <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg" alt="">
         <div class="play">▶</div>
       `;
-
       grid.appendChild(card);
-    }
-  });
+    });
 
-  loadCount++;
+    loadCount++;
+    document.getElementById("status").innerText = "";
+
+  } catch (err) {
+    console.error("FETCH FAILED:", err);
+    document.getElementById("status").innerText = "Network error. Try again.";
+  }
+
   isLoading = false;
 }
 
@@ -220,7 +245,6 @@ function openVideo(id) {
   document.getElementById("modal").style.display = "flex";
   document.getElementById("player").src = `https://www.youtube.com/embed/${id}?autoplay=1`;
 }
-
 function closeVideo() {
   document.getElementById("modal").style.display = "none";
   document.getElementById("player").src = "";
@@ -233,6 +257,7 @@ window.addEventListener("scroll", () => {
   }
 });
 
+// initial load
 loadVideos();
 </script>
 
