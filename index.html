@@ -17,30 +17,41 @@ body {
 }
 
 header {
-  padding: 30px 20px;
+  padding: 40px 20px;
   background: linear-gradient(90deg, #ff0000, #ff6600);
-  font-size: 32px;
+  font-size: 36px;
   font-weight: bold;
 }
 
 .subtext {
-  font-size: 16px;
+  font-size: 18px;
   margin-top: 10px;
 }
 
 .subscribe-btn {
   display: inline-block;
   margin-top: 20px;
-  padding: 12px 25px;
+  padding: 14px 30px;
   background: red;
   color: white;
   text-decoration: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: bold;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.subscribe-btn:hover {
+  background: #ff3333;
+  transform: scale(1.08);
 }
 
 .section {
   padding: 30px 20px;
+}
+
+h2 {
+  font-size: 26px;
 }
 
 .grid {
@@ -53,11 +64,16 @@ header {
 .card {
   position: relative;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.07);
 }
 
 .card img {
   width: 100%;
-  border-radius: 12px;
+  border-radius: 14px;
 }
 
 .play {
@@ -65,7 +81,7 @@ header {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 40px;
+  font-size: 42px;
   background: rgba(0,0,0,0.6);
   border-radius: 50%;
   padding: 10px 15px;
@@ -96,7 +112,7 @@ Subscribe on YouTube
 </header>
 
 <div class="section">
-<h2>🔥 Latest Shorts</h2>
+<h2>🔥 Most Popular Shorts</h2>
 
 <div class="grid">
 
@@ -104,28 +120,35 @@ Subscribe on YouTube
 <div class="card" onclick="openVideo('_eyyFwoYhhw')">
 <img src="https://img.youtube.com/vi/_eyyFwoYhhw/hqdefault.jpg">
 <div class="play">▶</div>
-<div class="caption">😂 Bro Thinks He's In an Edit</div>
+<div class="caption">🔥 Most Popular</div>
 </div>
 
 <!-- VIDEO 2 -->
 <div class="card" onclick="openVideo('YpK-P9iOtVw')">
 <img src="https://img.youtube.com/vi/YpK-P9iOtVw/hqdefault.jpg">
 <div class="play">▶</div>
-<div class="caption">🔥 1000 hours in training</div>
+<div class="caption">😂 Funny moment</div>
 </div>
 
 <!-- VIDEO 3 -->
 <div class="card" onclick="openVideo('oWNhQF4Q-m0')">
 <img src="https://img.youtube.com/vi/oWNhQF4Q-m0/hqdefault.jpg">
 <div class="play">▶</div>
-<div class="caption">💀 I wanna go to the Moon</div>
+<div class="caption">💀 Didn’t expect this</div>
 </div>
 
 <!-- VIDEO 4 -->
 <div class="card" onclick="openVideo('dIPeIAEAcxc')">
 <img src="https://img.youtube.com/vi/dIPeIAEAcxc/hqdefault.jpg">
 <div class="play">▶</div>
-<div class="caption">🚀 Bro Fell For It</div>
+<div class="caption">🚀 Chaos level 100</div>
+</div>
+
+<!-- VIDEO 5 -->
+<div class="card" onclick="openVideo('ZzsPi3cYiwk')">
+<img src="https://img.youtube.com/vi/ZzsPi3cYiwk/hqdefault.jpg">
+<div class="play">▶</div>
+<div class="caption">🔥 Another banger</div>
 </div>
 
 </div>
