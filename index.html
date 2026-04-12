@@ -171,6 +171,7 @@ let allVideos = [];
 let loadedCount = 0;
 const LOAD_BATCH = 8;
 
+// LOAD FEED
 async function loadFeed() {
   const res = await fetch(FEED_URL);
   const text = await res.text();
@@ -185,9 +186,12 @@ async function loadFeed() {
     allVideos.push(id);
   }
 
+  // 🔥 LOAD MULTIPLE BATCHES UP FRONT
   loadMore();
+  loadMore(); // now 16 videos instantly
 }
 
+// LOAD MORE
 function loadMore() {
   const grid = document.getElementById("videoGrid");
 
@@ -209,6 +213,7 @@ function loadMore() {
   }
 }
 
+// MODAL
 function openVideo(id) {
   document.getElementById("modal").style.display = "flex";
   document.getElementById("player").src = `https://www.youtube.com/embed/${id}?autoplay=1`;
@@ -219,9 +224,82 @@ function closeVideo() {
   document.getElementById("player").src = "";
 }
 
-// SCROLL LOAD
+// 🔥 BETTER SCROLL DETECTION
 window.addEventListener("scroll", () => {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+  if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 200)) {
+    loadMore();
+  }
+});
+
+loadFeed();
+
+</script><script>
+
+// RSS FEED
+const FEED_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(
+  "https://www.youtube.com/feeds/videos.xml?channel_id=UCfa5-QhuRmRa7eMIx9fsepQ"
+);
+
+let allVideos = [];
+let loadedCount = 0;
+const LOAD_BATCH = 8;
+
+// LOAD FEED
+async function loadFeed() {
+  const res = await fetch(FEED_URL);
+  const text = await res.text();
+
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, "text/xml");
+
+  const entries = xml.getElementsByTagName("entry");
+
+  for (let i = 0; i < entries.length; i++) {
+    const id = entries[i].getElementsByTagName("yt:videoId")[0].textContent;
+    allVideos.push(id);
+  }
+
+  // 🔥 LOAD MULTIPLE BATCHES UP FRONT
+  loadMore();
+  loadMore(); // now 16 videos instantly
+}
+
+// LOAD MORE
+function loadMore() {
+  const grid = document.getElementById("videoGrid");
+
+  for (let i = 0; i < LOAD_BATCH; i++) {
+    if (loadedCount >= allVideos.length) return;
+
+    const id = allVideos[loadedCount];
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.onclick = () => openVideo(id);
+
+    card.innerHTML = `
+      <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
+    `;
+
+    grid.appendChild(card);
+    loadedCount++;
+  }
+}
+
+// MODAL
+function openVideo(id) {
+  document.getElementById("modal").style.display = "flex";
+  document.getElementById("player").src = `https://www.youtube.com/embed/${id}?autoplay=1`;
+}
+
+function closeVideo() {
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("player").src = "";
+}
+
+// 🔥 BETTER SCROLL DETECTION
+window.addEventListener("scroll", () => {
+  if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 200)) {
     loadMore();
   }
 });
