@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Zoff | Roblox Videos</title>
-<meta name="description" content="Watch Zoff's Roblox Shorts and discover fun Roblox gear.">
 
 <style>
 body {
@@ -13,6 +12,23 @@ body {
   font-family: Arial, sans-serif;
   background: linear-gradient(#0a0f1c, #111827);
   color: white;
+}
+
+/* 🔥 TOP MONEY BAR */
+.top-bar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: #00c6ff;
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+  z-index: 999;
+}
+
+.top-bar a {
+  color: white;
+  text-decoration: none;
 }
 
 /* HEADER */
@@ -73,30 +89,6 @@ header {
   object-fit: cover;
 }
 
-.play {
-  position: absolute;
-}
-
-/* MONEY BOX */
-.money-box {
-  background: #1a2333;
-  margin: 30px;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.money-btn {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 10px 20px;
-  background: #00c6ff;
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-weight: bold;
-}
-
 /* MODAL */
 .modal {
   position: fixed;
@@ -136,6 +128,14 @@ footer {
 
 <body>
 
+<!-- 💰 TOP BAR -->
+<div class="top-bar">
+🎮 Get Roblox Gift Cards 👉 
+<a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
+Click Here
+</a>
+</div>
+
 <header>
 🔥 ZOFF 🔥
 <div class="subtext">Roblox chaos & insane moments</div>
@@ -151,16 +151,6 @@ Subscribe
 </div>
 
 <div class="grid" id="videoGrid"></div>
-
-<!-- 💰 MONEY SECTION -->
-<div class="money-box">
-<h2>🎮 Zoff’s Gear</h2>
-<p>Check out some cool Roblox gear and gaming stuff 👇</p>
-
-<a class="money-btn" href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
-🔥 View Gear
-</a>
-</div>
 
 <div class="content">
 <h2>🚀 About Zoff</h2>
@@ -185,7 +175,7 @@ const CHANNEL_ID = "UCfa5-QhuRmRa7eMIx9fsepQ";
 let nextPageToken = "";
 let isLoading = false;
 let loadCount = 0;
-const MAX_LOADS = 3;
+const MAX_LOADS = 5;
 
 async function loadVideos() {
   if (isLoading) return;
