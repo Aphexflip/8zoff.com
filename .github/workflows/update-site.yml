@@ -1,0 +1,86 @@
+name: Update and deploy site
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - index.html
+      - .github/workflows/update-site.yml
+  schedule:
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Build site files
+        run: |
+          mkdir -p dist
+          cp index.html dist/index.html
+          python - <<'PY'
+          import json
+          import urllib.request
+          import xml.etree.ElementTree as ET
+
+          channel_id = "UCfa5-QhuRmRa7eMIx9fsepQ"
+          url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
+
+          with urllib.request.urlopen(url, timeout=30) as response:
+              xml_data = response.read()
+
+          root = ET.fromstring(xml_data)
+
+          ns = {
+              "atom": "http://www.w3.org/2005/Atom",
+              "yt": "http://www.youtube.com/xml/schemas/2015"
+          }
+
+          videos = []
+          for entry in root.findall("atom:entry", ns):
+              video_id = entry.findtext("yt:videoId", default="", namespaces=ns)
+              title = entry.findtext("atom:title", default="", namespaces=ns)
+              published = entry.findtext("atom:published", default="", namespaces=ns)
+
+              if video_id:
+                  videos.append({
+                      "id": video_id,
+                      "title": title,
+                      "published": published
+                  })
+
+          with open("dist/videos.json", "w", encoding="utf-8") as f:
+              json.dump(videos, f, ensure_ascii=False, indent=2)
+          PY
+          touch dist/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
