@@ -14,7 +14,7 @@ body {
   color: white;
 }
 
-/* 🔥 TOP BAR */
+/* TOP BAR */
 .top-bar {
   position: sticky;
   top: 0;
@@ -35,7 +35,7 @@ header {
   font-size: 32px;
   font-weight: bold;
 }
-.subtext { font-size: 14px; }
+
 .subscribe-btn {
   margin-top: 10px;
   display: inline-block;
@@ -44,7 +44,6 @@ header {
   border-radius: 10px;
   color: white;
   text-decoration: none;
-  font-weight: bold;
 }
 
 /* GRID */
@@ -55,22 +54,24 @@ header {
   padding: 20px;
 }
 
-/* CARD */
 .card {
   position: relative;
   cursor: pointer;
   transition: 0.25s;
 }
+
 .card:hover {
   transform: scale(1.08);
   box-shadow: 0 0 15px #4facfe;
 }
+
 .card img {
   width: 100%;
   border-radius: 14px;
   aspect-ratio: 9/16;
   object-fit: cover;
 }
+
 .play {
   position: absolute;
   top: 50%; left: 50%;
@@ -79,15 +80,6 @@ header {
   background: rgba(0,0,0,0.6);
   border-radius: 50%;
   padding: 8px 12px;
-  color: #4facfe;
-}
-
-/* STATUS / ERRORS */
-.status {
-  text-align: center;
-  padding: 12px;
-  color: #9aa;
-  font-size: 13px;
 }
 
 /* MODAL */
@@ -100,19 +92,21 @@ header {
   justify-content: center;
   align-items: center;
 }
+
 .modal iframe {
   width: 90%;
   max-width: 400px;
   height: 70%;
 }
+
 .close {
   position: absolute;
-  top: 20px; right: 20px;
+  top: 20px;
+  right: 20px;
   font-size: 30px;
   cursor: pointer;
 }
 
-/* FOOTER */
 footer {
   text-align: center;
   padding: 20px;
@@ -124,19 +118,21 @@ footer {
 
 <body>
 
-<!-- 💰 AMAZON BAR -->
+<!-- AMAZON BAR -->
 <div class="top-bar">
 🎮 Roblox Gift Cards 👉 
-<a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">Get Yours</a>
+<a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
+Get Yours
+</a>
 </div>
 
 <header>
 🔥 ZOFF 🔥
-<div class="subtext">Roblox chaos & insane moments</div>
-<a class="subscribe-btn" href="https://www.youtube.com/@8zoff" target="_blank">Subscribe</a>
+<br>
+<a class="subscribe-btn" href="https://www.youtube.com/@8zoff" target="_blank">
+Subscribe
+</a>
 </header>
-
-<div id="status" class="status">Loading videos…</div>
 
 <div class="grid" id="videoGrid"></div>
 
@@ -146,14 +142,13 @@ footer {
 As an Amazon Associate, I earn from qualifying purchases.
 </footer>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
-  <span class="close" onclick="closeVideo()">✖</span>
-  <iframe id="player" src="" frameborder="0"></iframe>
+<span class="close" onclick="closeVideo()">✖</span>
+<iframe id="player"></iframe>
 </div>
 
 <script>
-const API_KEY = "AIzaSyAhWITFUBveF-dHZBDSYCY7o-zst-lmxrY";
+const API_KEY = "AIzaSyCec9tGthvDML6saweNC2YW26_AzG-2BnM";
 const CHANNEL_ID = "UCfa5-QhuRmRa7eMIx9fsepQ";
 
 let nextPageToken = "";
@@ -161,52 +156,44 @@ let isLoading = false;
 let loadCount = 0;
 const MAX_LOADS = 5;
 
-// Build URL safely (prevents malformed query issues)
-function buildUrl() {
-  const base = new URL("https://www.googleapis.com/youtube/v3/search");
-  base.searchParams.set("key", API_KEY);
-  base.searchParams.set("channelId", CHANNEL_ID);
-  base.searchParams.set("part", "snippet,id");
-  base.searchParams.set("order", "date");
-  base.searchParams.set("maxResults", "8");
-  base.searchParams.set("type", "video"); // ensure only videos
+// 🔥 CACHE SYSTEM
+const CACHE_KEY = "zoff_videos_cache";
+const CACHE_TIME = 10 * 60 * 1000; // 10 minutes
 
-  if (nextPageToken) {
-    base.searchParams.set("pageToken", nextPageToken);
-  }
-  return base.toString();
+function loadFromCache() {
+  const cached = localStorage.getItem(CACHE_KEY);
+  if (!cached) return false;
+
+  const parsed = JSON.parse(cached);
+  if (Date.now() - parsed.time > CACHE_TIME) return false;
+
+  document.getElementById("videoGrid").innerHTML = parsed.html;
+  return true;
+}
+
+function saveToCache(html) {
+  localStorage.setItem(CACHE_KEY, JSON.stringify({
+    time: Date.now(),
+    html: html
+  }));
 }
 
 async function loadVideos() {
   if (isLoading) return;
-  if (loadCount >= MAX_LOADS) {
-    document.getElementById("status").innerText = "You’ve reached the end. 👍";
-    return;
-  }
+  if (loadCount >= MAX_LOADS) return;
 
   isLoading = true;
-  document.getElementById("status").innerText = "Loading videos…";
+
+  let url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=8&type=video`;
+
+  if (nextPageToken) url += `&pageToken=${nextPageToken}`;
 
   try {
-    const url = buildUrl();
     const res = await fetch(url);
-
-    // Handle non-200 responses
-    if (!res.ok) {
-      const txt = await res.text();
-      console.error("HTTP ERROR:", res.status, txt);
-      document.getElementById("status").innerText = "Error loading videos. Refresh or try again.";
-      isLoading = false;
-      return;
-    }
-
     const data = await res.json();
 
-    // Handle API error payloads
-    if (!data || !data.items) {
-      console.error("API ERROR PAYLOAD:", data);
-      document.getElementById("status").innerText = "API error. Refresh page.";
-      isLoading = false;
+    if (!data.items) {
+      console.error(data);
       return;
     }
 
@@ -215,7 +202,8 @@ async function loadVideos() {
     const grid = document.getElementById("videoGrid");
 
     data.items.forEach(v => {
-      if (!v.id || !v.id.videoId) return;
+      if (!v.id.videoId) return;
+
       const id = v.id.videoId;
 
       const card = document.createElement("div");
@@ -223,42 +211,46 @@ async function loadVideos() {
       card.onclick = () => openVideo(id);
 
       card.innerHTML = `
-        <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg" alt="">
+        <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
         <div class="play">▶</div>
       `;
+
       grid.appendChild(card);
     });
 
     loadCount++;
-    document.getElementById("status").innerText = "";
+
+    // 🔥 SAVE CACHE
+    saveToCache(grid.innerHTML);
 
   } catch (err) {
-    console.error("FETCH FAILED:", err);
-    document.getElementById("status").innerText = "Network error. Try again.";
+    console.error(err);
   }
 
   isLoading = false;
 }
 
-/* MODAL */
+// 🔥 LOAD CACHE FIRST
+if (!loadFromCache()) {
+  loadVideos();
+}
+
 function openVideo(id) {
   document.getElementById("modal").style.display = "flex";
   document.getElementById("player").src = `https://www.youtube.com/embed/${id}?autoplay=1`;
 }
+
 function closeVideo() {
   document.getElementById("modal").style.display = "none";
   document.getElementById("player").src = "";
 }
 
-/* INFINITE SCROLL */
+// SCROLL
 window.addEventListener("scroll", () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadVideos();
   }
 });
-
-// initial load
-loadVideos();
 </script>
 
 </body>
