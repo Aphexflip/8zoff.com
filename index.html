@@ -33,17 +33,6 @@ header {
   text-align: center;
   background: linear-gradient(90deg, #4facfe, #00f2fe);
   font-size: 32px;
-  font-weight: bold;
-}
-
-.subscribe-btn {
-  margin-top: 10px;
-  display: inline-block;
-  padding: 10px 20px;
-  background: #4facfe;
-  border-radius: 10px;
-  color: white;
-  text-decoration: none;
 }
 
 /* GRID */
@@ -54,17 +43,15 @@ header {
   padding: 20px;
 }
 
+/* CARD */
 .card {
-  position: relative;
   cursor: pointer;
   transition: 0.25s;
 }
-
 .card:hover {
   transform: scale(1.08);
   box-shadow: 0 0 15px #4facfe;
 }
-
 .card img {
   width: 100%;
   border-radius: 14px;
@@ -72,33 +59,47 @@ header {
   object-fit: cover;
 }
 
-.play {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 32px;
-  background: rgba(0,0,0,0.6);
-  border-radius: 50%;
-  padding: 8px 12px;
+/* MID MONEY BLOCK */
+.money-block {
+  margin: 20px;
+  padding: 20px;
+  background: #1a2333;
+  text-align: center;
+  border-radius: 12px;
+}
+
+/* STICKY CTA */
+.sticky-cta {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #00c6ff;
+  text-align: center;
+  padding: 12px;
+  font-weight: bold;
+}
+.sticky-cta a {
+  color: white;
+  text-decoration: none;
 }
 
 /* MODAL */
 .modal {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0,0,0,0.95);
   display: none;
   justify-content: center;
   align-items: center;
 }
-
 .modal iframe {
   width: 90%;
   max-width: 400px;
   height: 70%;
 }
-
 .close {
   position: absolute;
   top: 20px;
@@ -109,16 +110,15 @@ header {
 
 footer {
   text-align: center;
-  padding: 20px;
+  padding: 60px 20px 100px;
   font-size: 12px;
-  color: #888;
 }
 </style>
 </head>
 
 <body>
 
-<!-- AMAZON BAR -->
+<!-- TOP BAR -->
 <div class="top-bar">
 🎮 Roblox Gift Cards 👉 
 <a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
@@ -128,13 +128,17 @@ Get Yours
 
 <header>
 🔥 ZOFF 🔥
-<br>
-<a class="subscribe-btn" href="https://www.youtube.com/@8zoff" target="_blank">
-Subscribe
-</a>
 </header>
 
 <div class="grid" id="videoGrid"></div>
+
+<!-- MID MONEY -->
+<div class="money-block">
+<h2>🎮 Get Roblox Gift Cards</h2>
+<a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
+🔥 Click Here
+</a>
+</div>
 
 <footer>
 © Zoff  
@@ -142,97 +146,67 @@ Subscribe
 As an Amazon Associate, I earn from qualifying purchases.
 </footer>
 
+<!-- STICKY CTA -->
+<div class="sticky-cta">
+🎮 Need Robux? 👉 
+<a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
+Get Gift Cards
+</a>
+</div>
+
+<!-- MODAL -->
 <div class="modal" id="modal">
 <span class="close" onclick="closeVideo()">✖</span>
 <iframe id="player"></iframe>
 </div>
 
 <script>
-const API_KEY = "AIzaSyCec9tGthvDML6saweNC2YW26_AzG-2BnM";
-const CHANNEL_ID = "UCfa5-QhuRmRa7eMIx9fsepQ";
 
-let nextPageToken = "";
-let isLoading = false;
-let loadCount = 0;
-const MAX_LOADS = 5;
+// RSS FEED
+const FEED_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(
+  "https://www.youtube.com/feeds/videos.xml?channel_id=UCfa5-QhuRmRa7eMIx9fsepQ"
+);
 
-// 🔥 CACHE SYSTEM
-const CACHE_KEY = "zoff_videos_cache";
-const CACHE_TIME = 10 * 60 * 1000; // 10 minutes
+let allVideos = [];
+let loadedCount = 0;
+const LOAD_BATCH = 8;
 
-function loadFromCache() {
-  const cached = localStorage.getItem(CACHE_KEY);
-  if (!cached) return false;
+async function loadFeed() {
+  const res = await fetch(FEED_URL);
+  const text = await res.text();
 
-  const parsed = JSON.parse(cached);
-  if (Date.now() - parsed.time > CACHE_TIME) return false;
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, "text/xml");
 
-  document.getElementById("videoGrid").innerHTML = parsed.html;
-  return true;
-}
+  const entries = xml.getElementsByTagName("entry");
 
-function saveToCache(html) {
-  localStorage.setItem(CACHE_KEY, JSON.stringify({
-    time: Date.now(),
-    html: html
-  }));
-}
-
-async function loadVideos() {
-  if (isLoading) return;
-  if (loadCount >= MAX_LOADS) return;
-
-  isLoading = true;
-
-  let url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=8&type=video`;
-
-  if (nextPageToken) url += `&pageToken=${nextPageToken}`;
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (!data.items) {
-      console.error(data);
-      return;
-    }
-
-    nextPageToken = data.nextPageToken || "";
-
-    const grid = document.getElementById("videoGrid");
-
-    data.items.forEach(v => {
-      if (!v.id.videoId) return;
-
-      const id = v.id.videoId;
-
-      const card = document.createElement("div");
-      card.className = "card";
-      card.onclick = () => openVideo(id);
-
-      card.innerHTML = `
-        <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
-        <div class="play">▶</div>
-      `;
-
-      grid.appendChild(card);
-    });
-
-    loadCount++;
-
-    // 🔥 SAVE CACHE
-    saveToCache(grid.innerHTML);
-
-  } catch (err) {
-    console.error(err);
+  for (let i = 0; i < entries.length; i++) {
+    const id = entries[i].getElementsByTagName("yt:videoId")[0].textContent;
+    allVideos.push(id);
   }
 
-  isLoading = false;
+  loadMore();
 }
 
-// 🔥 LOAD CACHE FIRST
-if (!loadFromCache()) {
-  loadVideos();
+function loadMore() {
+  const grid = document.getElementById("videoGrid");
+
+  for (let i = 0; i < LOAD_BATCH; i++) {
+    if (loadedCount >= allVideos.length) return;
+
+    const id = allVideos[loadedCount];
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.onclick = () => openVideo(id);
+
+    card.innerHTML = `
+      <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
+    `;
+
+    grid.appendChild(card);
+    loadedCount++;
+  }
 }
 
 function openVideo(id) {
@@ -245,12 +219,15 @@ function closeVideo() {
   document.getElementById("player").src = "";
 }
 
-// SCROLL
+// SCROLL LOAD
 window.addEventListener("scroll", () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
-    loadVideos();
+    loadMore();
   }
 });
+
+loadFeed();
+
 </script>
 
 </body>
