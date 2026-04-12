@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Zoff | Roblox Videos</title>
-<meta name="description" content="Watch Zoff's Roblox Shorts. Funny Roblox moments, chaos gameplay, and daily videos.">
+<meta name="description" content="Watch Zoff's Roblox Shorts and discover fun Roblox gear and content.">
 
 <style>
 body {
@@ -39,12 +39,11 @@ header {
   font-weight: bold;
 }
 
-/* CONTENT SECTION */
+/* CONTENT */
 .content {
   padding: 20px;
   max-width: 900px;
   margin: auto;
-  line-height: 1.6;
   color: #ccc;
 }
 
@@ -87,9 +86,25 @@ header {
   color: #4facfe;
 }
 
-.caption {
-  font-size: 12px;
-  margin-top: 5px;
+/* MONEY BLOCK */
+.money-box {
+  margin: 30px auto;
+  max-width: 800px;
+  background: #1a2333;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.money-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #00c6ff;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
 }
 
 /* MODAL */
@@ -119,12 +134,10 @@ header {
   cursor: pointer;
 }
 
-/* FOOTER */
 footer {
   text-align: center;
   padding: 20px;
   color: #888;
-  font-size: 14px;
 }
 </style>
 </head>
@@ -136,31 +149,31 @@ footer {
 <div class="subtext">Roblox chaos & insane moments</div>
 
 <a class="subscribe-btn" href="https://www.youtube.com/@8zoff" target="_blank">
-Subscribe on YouTube
+Subscribe
 </a>
 </header>
 
 <div class="content">
-<h2>🔥 Latest Roblox Shorts</h2>
-<p>
-Zoff creates fast-paced Roblox Shorts filled with funny moments, unexpected gameplay, and chaotic challenges.
-New videos are added regularly, so check back often to see the latest clips.
-</p>
+<h2>🔥 Latest Videos</h2>
+<p>Watch the newest Roblox Shorts from Zoff.</p>
 </div>
 
+<!-- VIDEO GRID -->
 <div class="grid" id="videoGrid"></div>
+
+<!-- 💰 MONEY SECTION -->
+<div class="money-box">
+<h2>🎮 Zoff’s Setup</h2>
+<p>Check out some of the gear and Roblox stuff used in these videos.</p>
+
+<a class="money-btn" href="https://amzn.to/YOURAFFILIATE" target="_blank">
+🔥 View Gear
+</a>
+</div>
 
 <div class="content">
 <h2>🚀 About Zoff</h2>
-<p>
-Zoff is a growing Roblox creator focused on entertaining short-form content.  
-Each video is designed to be quick, engaging, and fun to watch.
-</p>
-
-<h2>📅 Daily Updates</h2>
-<p>
-New Roblox Shorts are posted frequently. Stay updated by subscribing on YouTube or checking this site regularly.
-</p>
+<p>Zoff creates fast-paced Roblox Shorts packed with fun and chaos.</p>
 </div>
 
 <footer>
@@ -180,7 +193,7 @@ const CHANNEL_ID = "UCfa5-QhuRmRa7eMIx9fsepQ";
 let nextPageToken = "";
 let isLoading = false;
 let loadCount = 0;
-const MAX_LOADS = 2; // 🔥 limits infinite scroll
+const MAX_LOADS = 5;
 
 async function loadVideos() {
   if (isLoading) return;
@@ -212,7 +225,6 @@ async function loadVideos() {
       card.innerHTML = `
         <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
         <div class="play">▶</div>
-        <div class="caption">${video.snippet.title}</div>
       `;
 
       grid.appendChild(card);
@@ -220,38 +232,19 @@ async function loadVideos() {
   });
 
   loadCount++;
-
-  // 🔥 When limit reached, show button
-  if (loadCount >= MAX_LOADS) {
-    showLoadMoreButton();
-  }
-
   isLoading = false;
 }
 
-/* LOAD MORE BUTTON */
-function showLoadMoreButton() {
-  const btn = document.createElement("button");
-  btn.innerText = "Load More Videos";
-  btn.style.margin = "20px auto";
-  btn.style.display = "block";
-  btn.style.padding = "10px 20px";
-  btn.style.background = "#4facfe";
-  btn.style.color = "white";
-  btn.style.border = "none";
-  btn.style.borderRadius = "8px";
-  btn.style.cursor = "pointer";
-
-  btn.onclick = () => {
-    loadCount = 0; // reset limit
-    btn.remove();
-    loadVideos();
-  };
-
-  document.body.appendChild(btn);
+function openVideo(id) {
+  document.getElementById("modal").style.display = "flex";
+  document.getElementById("player").src = `https://www.youtube.com/embed/${id}?autoplay=1`;
 }
 
-/* SCROLL TRIGGER */
+function closeVideo() {
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("player").src = "";
+}
+
 window.addEventListener("scroll", () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadVideos();
