@@ -179,9 +179,13 @@ const CHANNEL_ID = "UCfa5-QhuRmRa7eMIx9fsepQ";
 
 let nextPageToken = "";
 let isLoading = false;
+let loadCount = 0;
+const MAX_LOADS = 5; // 🔥 limits infinite scroll
 
 async function loadVideos() {
   if (isLoading) return;
+  if (loadCount >= MAX_LOADS) return;
+
   isLoading = true;
 
   let url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=8`;
@@ -215,19 +219,39 @@ async function loadVideos() {
     }
   });
 
+  loadCount++;
+
+  // 🔥 When limit reached, show button
+  if (loadCount >= MAX_LOADS) {
+    showLoadMoreButton();
+  }
+
   isLoading = false;
 }
 
-function openVideo(id) {
-  document.getElementById("modal").style.display = "flex";
-  document.getElementById("player").src = `https://www.youtube.com/embed/${id}?autoplay=1`;
+/* LOAD MORE BUTTON */
+function showLoadMoreButton() {
+  const btn = document.createElement("button");
+  btn.innerText = "Load More Videos";
+  btn.style.margin = "20px auto";
+  btn.style.display = "block";
+  btn.style.padding = "10px 20px";
+  btn.style.background = "#4facfe";
+  btn.style.color = "white";
+  btn.style.border = "none";
+  btn.style.borderRadius = "8px";
+  btn.style.cursor = "pointer";
+
+  btn.onclick = () => {
+    loadCount = 0; // reset limit
+    btn.remove();
+    loadVideos();
+  };
+
+  document.body.appendChild(btn);
 }
 
-function closeVideo() {
-  document.getElementById("modal").style.display = "none";
-  document.getElementById("player").src = "";
-}
-
+/* SCROLL TRIGGER */
 window.addEventListener("scroll", () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadVideos();
