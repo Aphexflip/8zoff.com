@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Zoff | Roblox Shorts</title>
+<title>Zoff | Roblox Videos</title>
+<meta name="description" content="Watch Zoff's Roblox Shorts. Funny Roblox moments, chaos gameplay, and daily videos.">
 
 <style>
 body {
@@ -36,12 +37,15 @@ header {
   color: white;
   text-decoration: none;
   font-weight: bold;
-  transition: 0.2s;
 }
 
-.subscribe-btn:hover {
-  background: #00c6ff;
-  transform: scale(1.08);
+/* CONTENT SECTION */
+.content {
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+  line-height: 1.6;
+  color: #ccc;
 }
 
 /* GRID */
@@ -71,24 +75,21 @@ header {
   object-fit: cover;
 }
 
-/* PLAY ICON */
 .play {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 32px;
+  font-size: 30px;
   background: rgba(0,0,0,0.6);
   border-radius: 50%;
-  padding: 8px 12px;
+  padding: 6px 10px;
   color: #4facfe;
 }
 
-/* TITLE */
 .caption {
   font-size: 12px;
   margin-top: 5px;
-  color: #ccc;
 }
 
 /* MODAL */
@@ -102,14 +103,12 @@ header {
   display: none;
   justify-content: center;
   align-items: center;
-  z-index: 999;
 }
 
 .modal iframe {
   width: 90%;
   max-width: 400px;
   height: 70%;
-  border-radius: 12px;
 }
 
 .close {
@@ -120,10 +119,12 @@ header {
   cursor: pointer;
 }
 
-.loader {
+/* FOOTER */
+footer {
   text-align: center;
   padding: 20px;
-  color: #aaa;
+  color: #888;
+  font-size: 14px;
 }
 </style>
 </head>
@@ -135,12 +136,36 @@ header {
 <div class="subtext">Roblox chaos & insane moments</div>
 
 <a class="subscribe-btn" href="https://www.youtube.com/@8zoff" target="_blank">
-Subscribe
+Subscribe on YouTube
 </a>
 </header>
 
+<div class="content">
+<h2>🔥 Latest Roblox Shorts</h2>
+<p>
+Zoff creates fast-paced Roblox Shorts filled with funny moments, unexpected gameplay, and chaotic challenges.
+New videos are added regularly, so check back often to see the latest clips.
+</p>
+</div>
+
 <div class="grid" id="videoGrid"></div>
-<div class="loader">Scroll for more...</div>
+
+<div class="content">
+<h2>🚀 About Zoff</h2>
+<p>
+Zoff is a growing Roblox creator focused on entertaining short-form content.  
+Each video is designed to be quick, engaging, and fun to watch.
+</p>
+
+<h2>📅 Daily Updates</h2>
+<p>
+New Roblox Shorts are posted frequently. Stay updated by subscribing on YouTube or checking this site regularly.
+</p>
+</div>
+
+<footer>
+© Zoff | Roblox Content Hub
+</footer>
 
 <!-- MODAL -->
 <div class="modal" id="modal">
@@ -165,40 +190,34 @@ async function loadVideos() {
     url += `&pageToken=${nextPageToken}`;
   }
 
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
+  const res = await fetch(url);
+  const data = await res.json();
 
-    nextPageToken = data.nextPageToken || "";
+  nextPageToken = data.nextPageToken || "";
 
-    const grid = document.getElementById("videoGrid");
+  const grid = document.getElementById("videoGrid");
 
-    data.items.forEach(video => {
-      if (video.id.videoId) {
-        const id = video.id.videoId;
+  data.items.forEach(video => {
+    if (video.id.videoId) {
+      const id = video.id.videoId;
 
-        const card = document.createElement("div");
-        card.className = "card";
-        card.onclick = () => openVideo(id);
+      const card = document.createElement("div");
+      card.className = "card";
+      card.onclick = () => openVideo(id);
 
-        card.innerHTML = `
-          <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
-          <div class="play">▶</div>
-          <div class="caption">${video.snippet.title}</div>
-        `;
+      card.innerHTML = `
+        <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
+        <div class="play">▶</div>
+        <div class="caption">${video.snippet.title}</div>
+      `;
 
-        grid.appendChild(card);
-      }
-    });
-
-  } catch (err) {
-    console.error("Error:", err);
-  }
+      grid.appendChild(card);
+    }
+  });
 
   isLoading = false;
 }
 
-/* MODAL PLAYER */
 function openVideo(id) {
   document.getElementById("modal").style.display = "flex";
   document.getElementById("player").src = `https://www.youtube.com/embed/${id}?autoplay=1`;
@@ -209,7 +228,6 @@ function closeVideo() {
   document.getElementById("player").src = "";
 }
 
-/* INFINITE SCROLL */
 window.addEventListener("scroll", () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadVideos();
