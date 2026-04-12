@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Zoff | Roblox Videos</title>
+<title>Zoff | Roblox Shorts</title>
 
 <style>
 body {
@@ -14,7 +14,7 @@ body {
   color: white;
 }
 
-/* 🔥 TOP MONEY BAR */
+/* 🔥 TOP BAR */
 .top-bar {
   position: sticky;
   top: 0;
@@ -23,7 +23,7 @@ body {
   text-align: center;
   padding: 10px;
   font-weight: bold;
-  z-index: 999;
+  z-index: 1000;
 }
 
 .top-bar a {
@@ -55,14 +55,6 @@ header {
   font-weight: bold;
 }
 
-/* CONTENT */
-.content {
-  padding: 20px;
-  max-width: 900px;
-  margin: auto;
-  color: #ccc;
-}
-
 /* GRID */
 .grid {
   display: grid;
@@ -73,6 +65,7 @@ header {
 
 /* CARD */
 .card {
+  position: relative;
   cursor: pointer;
   transition: 0.25s;
 }
@@ -89,6 +82,19 @@ header {
   object-fit: cover;
 }
 
+/* PLAY ICON */
+.play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  padding: 8px 12px;
+  color: #4facfe;
+}
+
 /* MODAL */
 .modal {
   position: fixed;
@@ -96,7 +102,7 @@ header {
   left: 0;
   width: 100%;
   height: 100%;
-  background: black;
+  background: rgba(0,0,0,0.95);
   display: none;
   justify-content: center;
   align-items: center;
@@ -128,11 +134,11 @@ footer {
 
 <body>
 
-<!-- 💰 TOP BAR -->
+<!-- 💰 AMAZON BAR -->
 <div class="top-bar">
-🎮 Get Roblox Gift Cards 👉 
+🎮 Roblox Gift Cards 👉 
 <a href="https://amzn.to/4c4zWPA" target="_blank" rel="nofollow sponsored">
-Click Here
+Get Yours
 </a>
 </div>
 
@@ -145,17 +151,8 @@ Subscribe
 </a>
 </header>
 
-<div class="content">
-<h2>🔥 Latest Videos</h2>
-<p>Watch the latest Roblox chaos and funny moments.</p>
-</div>
-
+<!-- VIDEO GRID -->
 <div class="grid" id="videoGrid"></div>
-
-<div class="content">
-<h2>🚀 About Zoff</h2>
-<p>Zoff creates fast-paced Roblox Shorts packed with fun and chaos.</p>
-</div>
 
 <footer>
 © Zoff  
@@ -163,6 +160,7 @@ Subscribe
 As an Amazon Associate, I earn from qualifying purchases.
 </footer>
 
+<!-- MODAL -->
 <div class="modal" id="modal">
 <span class="close" onclick="closeVideo()">✖</span>
 <iframe id="player" src="" frameborder="0"></iframe>
@@ -185,7 +183,9 @@ async function loadVideos() {
 
   let url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=8`;
 
-  if (nextPageToken) url += `&pageToken=${nextPageToken}`;
+  if (nextPageToken) {
+    url += `&pageToken=${nextPageToken}`;
+  }
 
   const res = await fetch(url);
   const data = await res.json();
@@ -202,7 +202,10 @@ async function loadVideos() {
       card.className = "card";
       card.onclick = () => openVideo(id);
 
-      card.innerHTML = `<img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">`;
+      card.innerHTML = `
+        <img src="https://img.youtube.com/vi/${id}/hqdefault.jpg">
+        <div class="play">▶</div>
+      `;
 
       grid.appendChild(card);
     }
@@ -212,6 +215,7 @@ async function loadVideos() {
   isLoading = false;
 }
 
+/* MODAL */
 function openVideo(id) {
   document.getElementById("modal").style.display = "flex";
   document.getElementById("player").src = `https://www.youtube.com/embed/${id}?autoplay=1`;
@@ -222,6 +226,7 @@ function closeVideo() {
   document.getElementById("player").src = "";
 }
 
+/* INFINITE SCROLL */
 window.addEventListener("scroll", () => {
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
     loadVideos();
