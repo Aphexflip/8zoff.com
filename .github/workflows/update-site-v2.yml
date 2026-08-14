@@ -1,0 +1,70 @@
+name: Update and deploy site v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - index.html
+      - CNAME
+      - videos.json
+      - tools/build_videos.py
+      - tests/test_build_videos.py
+      - .github/workflows/update-site-v2.yml
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-v2
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Test resilient video builder
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: Build site files
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cp index.html dist/index.html
+          cp CNAME dist/CNAME
+          python tools/build_videos.py --output dist/videos.json
+          touch dist/.nojekyll
+          test -s dist/index.html
+          test -s dist/videos.json
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
